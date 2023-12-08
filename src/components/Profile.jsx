@@ -1,8 +1,6 @@
 import React from "react";
 import "./Profile.css";
 import { useNavigate } from "react-router-dom";
-import Header from "./Header";
-import Sidebar from "./Sidebar";
 import Layout from "./Layout";
 
 function Profile(props) {

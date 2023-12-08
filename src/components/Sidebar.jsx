@@ -14,7 +14,7 @@ function Sidebar() {
         <li onClick={() => navigate("/courses")}>
           <FaHome />
         </li>
-        <li>
+        <li onClick={() => navigate("/courses/create")}>
           <FaPlusCircle />
         </li>
         <li>

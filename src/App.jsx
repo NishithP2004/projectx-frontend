@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import LoginPage from './components/LoginPage'
 import Profile from './components/Profile'
 import Courses from './components/Courses'
+import Create from './components/Create'
 
 import {
   initializeApp
@@ -63,8 +64,9 @@ function App() {
         <Router>
           {(user && user?.email)? 
             <Routes>
-              <Route path="/login" element={<Loggit ininPage auth={auth} />} />
+              <Route path="/login" element={<LoginPage auth={auth} />} />
               <Route path="/courses" element={<Courses user={user} auth={auth} />} />
+              <Route path="/courses/create" element={<Create user={user} auth={auth} />} />
               <Route path="/profile" element={<Profile user={user} auth={auth} />} />
               <Route path="*" element={<Navigate to="/courses" />} />
             </Routes>

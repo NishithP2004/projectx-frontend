@@ -24,6 +24,8 @@ aside ul li {
   aside {
     display: flex;
     flex-flow: row no-wrap;
+    flex-direction: row;
+    flex-wrap: nowrap;
     position: fixed;
     bottom: 0;
     left: 50%;
@@ -35,6 +37,7 @@ aside ul li {
     margin-bottom: 10px;
     vertical-align: middle;
     z-index: 100;
+    width: max-content;
   }
 
   aside ul li {

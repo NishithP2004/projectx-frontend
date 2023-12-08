@@ -35,6 +35,28 @@ app.get("/api", (req, res) => {
     res.send("Hello World")
 })
 
+app.get("/api/courses/list", async (req, res) => {
+    let data = await fetch("https://projectx-backend.azurewebsites.net/api/courses/list",{
+        headers: {
+            'authorization': req.headers["Authorization"]
+          },
+        method: "GET"
+    })
+    .then(r => r.json())
+    .then(r => {
+        return r
+    })
+    .catch(err => {
+        console.log(err)
+        res.json({
+            success: false,
+            error: err
+        })
+    })
+    console.log(data)
+    res.json(data)
+})
+
 io.on('connection', client => {
     console.log(`Connected to ${client.id}`);
 })
