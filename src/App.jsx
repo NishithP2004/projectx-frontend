@@ -4,6 +4,7 @@ import LoginPage from './components/LoginPage'
 import Profile from './components/Profile'
 import Courses from './components/Courses'
 import Create from './components/Create'
+import { SnackbarProvider, enqueueSnackbar } from 'notistack';
 
 import {
   initializeApp
@@ -15,7 +16,6 @@ import {
   getAuth,
   onAuthStateChanged
 } from "firebase/auth"
-import firebase from 'firebase/compat/app'
 import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate } from 'react-router-dom'
 
 function App() {
@@ -48,9 +48,12 @@ function App() {
             uid: user.uid,
             name: user.displayName,
             email: user.email,
-            img: user.photoURL
+            img: user.photoURL || "https://i.imgur.com/LzFRRWx.png"
           });
           sessionStorage.setItem('token', user.accessToken)
+          enqueueSnackbar(`Logged in as ${user.displayName}`, {
+            variant: "success"
+          })
         } else {
           setUser(null)
         }
@@ -61,6 +64,7 @@ function App() {
 
   return ( 
       <main>
+        <SnackbarProvider />
         <Router>
           {(user && user?.email)? 
             <Routes>

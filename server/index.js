@@ -2,16 +2,27 @@ const express = require('express');
 require('dotenv').config({
     path: '../.env'
 })
-const { instrument } = require('@socket.io/admin-ui');
+const {
+    instrument
+} = require('@socket.io/admin-ui');
 const http = require('http')
 const admin = require('firebase-admin');
 const cors = require('cors')
+const multer = require('multer');
+
+const { Buffer } = require('node:buffer')
+const fs = require('node:fs')
+
+const upload = multer({
+    limits: 50 // 50mb
+})
 
 const app = express();
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }))
-app.use(cors())
+app.use(express.urlencoded({
+    extended: true
+}))
 
 const PORT = process.env.PORT || 3000;
 
@@ -36,25 +47,66 @@ app.get("/api", (req, res) => {
 })
 
 app.get("/api/courses/list", async (req, res) => {
-    let data = await fetch("https://projectx-backend.azurewebsites.net/api/courses/list",{
-        headers: {
-            'authorization': req.headers["Authorization"]
-          },
-        method: "GET"
-    })
-    .then(r => r.json())
-    .then(r => {
-        return r
-    })
-    .catch(err => {
-        console.log(err)
-        res.json({
-            success: false,
-            error: err
-        })
-    })
-    console.log(data)
-    res.json(data)
+    try {
+        let data = await fetch("https://projectx-backend.azurewebsites.net/api/courses/list", {
+                headers: {
+                    'Authorization': req.headers.authorization
+                },
+                method: "GET"
+            })
+            .then(r => r.json())
+            .catch(err => {
+                console.log(err)
+                res.json({
+                    success: false,
+                    error: err.message
+                })
+            })
+
+        console.log(data)
+        res.json(data)
+    } catch (err) {
+        if (err)
+            res.status(500).send({
+                success: false,
+                error: err.message
+            })
+    }
+})
+
+app.post("/api/courses/create",  upload.single("file"), async (req, res) => {
+    try {
+        let formData = new FormData();
+        formData.append("course_name", req.body.course_name)
+        console.log(req.file)
+        const blob = new Blob([req.file.buffer])
+        formData.append("file", blob, req.file.originalname)
+
+        let data = await fetch("https://projectx-backend.azurewebsites.net/api/courses/create", {
+                headers: {
+                    'Authorization': req.headers.authorization
+                },
+                body: formData,
+                method: "POST"
+            })
+            .then(r => r.json())
+            .catch(err => {
+                console.log(err)
+                res.json({
+                    success: false,
+                    error: err.message
+                })
+            })
+
+        console.log(data)
+        res.json(data)
+    } catch (err) {
+        if (err)
+            res.status(500).send({
+                success: false,
+                error: err.message
+            })
+    }
 })
 
 io.on('connection', client => {

@@ -54,5 +54,5 @@
 
 #create-course input:focus {
   border: 1px solid hsla(307, 93%, 84%, 1);
-  outline: 2px solid  hsla(307, 93%, 84%, 0.85);
+  outline: 2px solid hsla(307, 93%, 84%, 0.85);
 }

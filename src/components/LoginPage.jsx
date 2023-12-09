@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import * as firebaseui from "firebaseui";
 import "firebaseui/dist/firebaseui.css";
 import firebase from "firebase/compat/app";
+import { enqueueSnackbar } from "notistack";
 
 export default function LoginPage(props) {
   useEffect(() => {
@@ -37,6 +38,9 @@ export default function LoginPage(props) {
           // will reset, clearing any UI. This commonly occurs for error code
           // 'firebaseui/anonymous-upgrade-merge-conflict' when merge conflict
           // occurs. Check below for more details on this.
+          enqueueSnackbar(`Login Failed`, {
+            variant: "error",
+          });
           console.error(error);
         },
       },

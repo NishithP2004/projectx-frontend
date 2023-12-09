@@ -2,6 +2,7 @@ import React from "react";
 import "./Profile.css";
 import { useNavigate } from "react-router-dom";
 import Layout from "./Layout";
+import { enqueueSnackbar } from "notistack";
 
 function Profile(props) {
   const navigate = useNavigate();
@@ -11,6 +12,9 @@ function Profile(props) {
       .signOut()
       .then(() => {
         // Redirect to the login page after signing out
+        enqueueSnackbar("Signed out successfully", {
+          variant: "info",
+        });
         navigate("/login");
       })
       .catch((error) => {
