@@ -11,42 +11,41 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: 'ubuntu-latest'
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
 
-      - name: Log in to container registry
-        uses: docker/login-action@v2
-        with:
-          registry: https://index.docker.io/v1/
-          username: ${{ secrets.AzureAppService_ContainerUsername_e0eb17740db648eab05848907365cc34 }}
-          password: ${{ secrets.AzureAppService_ContainerPassword_3c88c7c290a24be0bf1202b9994ccf4a }}
+    - name: Log in to registry
+      uses: docker/login-action@v2
+      with:
+        registry: https://index.docker.io/v1/
+        username: ${{ secrets.AzureAppService_ContainerUsername_e0eb17740db648eab05848907365cc34 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_3c88c7c290a24be0bf1202b9994ccf4a }}
 
-      - name: Build and push container image to registry
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: true
-          tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_e0eb17740db648eab05848907365cc34 }}/projectx-frontend:${{ github.sha }}
-          file: ./Dockerfile
+    - name: Build and push container image to registry
+      uses: docker/build-push-action@v3
+      with:
+        push: true
+        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_e0eb17740db648eab05848907365cc34 }}/projectx-frontend:${{ github.sha }}
+        file: ./Dockerfile
 
-    deploy:
-      runs-on: ubuntu-latest
-      needs: build
-      environment:
-        name: 'production'
-        url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
-      steps:
-        - name: Deploy to Azure Web App
-          id: deploy-to-webapp
-          uses: azure/webapps-deploy@v2
-          with:
-            app-name: 'projectx-frontend'
-            slot-name: 'production'
-            publish-profile: ${{ secrets.AzureAppService_PublishProfile_e2bf7462774a42ae879ba77b83e92279 }}
-            images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_e0eb17740db648eab05848907365cc34 }}/projectx-frontend:${{ github.sha }}'
+    steps:
+    - name: Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'projectx-frontend'
+        slot-name: 'production'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_e2bf7462774a42ae879ba77b83e92279 }}
+        images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_e0eb17740db648eab05848907365cc34 }}/projectx-frontend:${{ github.sha }}'
