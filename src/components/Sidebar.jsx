@@ -3,6 +3,7 @@ import { FaPlusCircle } from "react-icons/fa";
 import { SiGoogledocs } from "react-icons/si";
 import { SlDocs } from "react-icons/sl";
 import { FaHome } from "react-icons/fa";
+import { FaGlobeAmericas } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Tooltip, IconButton } from "@mui/material";
 
@@ -25,19 +26,24 @@ function Sidebar() {
           </Tooltip>
         </li>
         <li onClick={() => navigate("/courses/create")}>
-          <Tooltip title="Create Course">
+          <Tooltip title="Create a Course">
             <IconButton
               style={{
                 fontSize: "1em",
-                color: "black",
+                color: "brown",
               }}
             >
               <FaPlusCircle />
             </IconButton>
           </Tooltip>
         </li>
-        <li>
-          <Tooltip title="Home">
+        <li
+          onClick={() => {
+            let course_id = localStorage.getItem("course_id");
+            course_id ? navigate("/courses/" + course_id) : "";
+          }}
+        >
+          <Tooltip title="Document">
             <IconButton
               style={{
                 fontSize: "1em",
@@ -49,14 +55,14 @@ function Sidebar() {
           </Tooltip>
         </li>
         <li>
-          <Tooltip title="Home">
+          <Tooltip title="References">
             <IconButton
               style={{
                 fontSize: "1em",
                 color: "black",
               }}
             >
-              <SlDocs />
+              <FaGlobeAmericas />
             </IconButton>
           </Tooltip>
         </li>

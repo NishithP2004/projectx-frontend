@@ -1,7 +1,6 @@
 import "./Create.css";
 import Layout from "./Layout";
 import Section from "./Section";
-import { useEffect, useState } from "react";
 import { enqueueSnackbar } from "notistack";
 
 function Create(props) {
@@ -15,7 +14,7 @@ function Create(props) {
     await fetch(form.action, {
       method: form.method,
       headers: {
-        Authorization: `bearer ${sessionStorage.getItem("token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
       body: formData,
     })
@@ -45,7 +44,7 @@ function Create(props) {
 
   return (
     <Layout user={props.user}>
-      <Section title="Create Course">
+      <Section title="Create a Course">
         <div
           className="glass container"
           style={{
