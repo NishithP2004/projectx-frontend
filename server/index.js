@@ -25,9 +25,9 @@ app.use(
   })
 );
 
-// app.use(express.static("public/dist"))
+app.use(express.static("public/dist"))
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 80;
 
 const server = http.createServer(app);
 
@@ -270,9 +270,9 @@ app.get("/api/reels", async (req, res) => {
   }
 });
 
-// app.get("*", (req, res) => {
-//   res.sendFile(path.resolve("public", "dist", "index.html"))
-// })
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve("public", "dist", "index.html"))
+})
 
 io.on("connection", (client) => {
   console.log(`Connected to ${client.id}`);
