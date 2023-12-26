@@ -21,11 +21,11 @@ app.use(express.json());
 
 app.use(
   express.urlencoded({
-    extended: true,
-  }),
+    extended: true
+  })
 );
 
-app.use(express.static("public/dist"))
+// app.use(express.static("public/dist"))
 
 const PORT = process.env.PORT || 3000;
 
@@ -146,9 +146,133 @@ app.get("/api/courses/documents/:id", async (req, res) => {
   }
 });
 
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve("public", "dist", "index.html"))
-})
+app.post("/api/search-queries", async (req, res) => {
+  const content = req.body.content
+  console.log(content)
+  try {
+    let data = await fetch(
+        `https://projectx-backend.azurewebsites.net/api/search-queries`, {
+          method: "POST",
+          headers: {
+            Authorization: req.headers.authorization
+          },
+          body: JSON.stringify({
+            content: content
+          })
+        }
+      )
+      .then((r) => r.json())
+      .catch((err) => {
+        console.log(err);
+        res.json({
+          success: false,
+          error: err.message,
+        });
+      });
+    res.json(data);
+  } catch (err) {
+    if (err)
+      res.status(500).send({
+        success: false,
+        error: err.message,
+      });
+  }
+});
+
+app.post("/api/quiz", async (req, res) => {
+  const transcript = req.body.transcript
+
+  try {
+    let data = await fetch(
+        `https://projectx-backend.azurewebsites.net/api/quiz`, {
+          method: "POST",
+          headers: {
+            Authorization: req.headers.authorization
+          },
+          body: JSON.stringify({
+            transcript: transcript
+          })
+        }
+      )
+      .then((r) => r.json())
+      .catch((err) => {
+        console.log(err);
+        res.json({
+          success: false,
+          error: err.message,
+        });
+      });
+    res.json(data);
+  } catch (err) {
+    if (err)
+      res.status(500).send({
+        success: false,
+        error: err.message,
+      });
+  }
+});
+
+app.get("/api/search", async (req, res) => {
+  try {
+    let data = await fetch(
+        `https://projectx-backend.azurewebsites.net/api/search?q=${req.query.q}&type=bing`, {
+          headers: {
+            Authorization: req.headers.authorization
+          },
+          method: "GET"
+        }
+      )
+      .then((r) => r.json())
+      .catch((err) => {
+        console.log(err);
+        res.json({
+          success: false,
+          error: err.message,
+        });
+      });
+
+    res.json(data);
+  } catch (err) {
+    if (err)
+      res.status(500).send({
+        success: false,
+        error: err.message,
+      });
+  }
+});
+
+app.get("/api/reels", async (req, res) => {
+  try {
+    let data = await fetch(
+        `https://projectx-backend.azurewebsites.net/api/reels?q=${req.query.q}`, {
+          headers: {
+            Authorization: req.headers.authorization
+          },
+          method: "GET"
+        }
+      )
+      .then((r) => r.json())
+      .catch((err) => {
+        console.log(err);
+        res.json({
+          success: false,
+          error: err.message,
+        });
+      });
+      
+    res.json(data);
+  } catch (err) {
+    if (err)
+      res.status(500).send({
+        success: false,
+        error: err.message,
+      });
+  }
+});
+
+// app.get("*", (req, res) => {
+//   res.sendFile(path.resolve("public", "dist", "index.html"))
+// })
 
 io.on("connection", (client) => {
   console.log(`Connected to ${client.id}`);

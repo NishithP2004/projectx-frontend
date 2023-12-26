@@ -43,7 +43,7 @@ function Sidebar() {
             course_id ? navigate("/courses/" + course_id) : "";
           }}
         >
-          <Tooltip title="Document">
+          <Tooltip title="Document Reader">
             <IconButton
               style={{
                 fontSize: "1em",
@@ -54,7 +54,12 @@ function Sidebar() {
             </IconButton>
           </Tooltip>
         </li>
-        <li>
+        <li
+          onClick={() => {
+            let course_id = localStorage.getItem("course_id");
+            course_id ? navigate("/courses/references/" + course_id) : "";
+          }}
+        >
           <Tooltip title="References">
             <IconButton
               style={{

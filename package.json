@@ -17,6 +17,7 @@
     "@chatscope/chat-ui-kit-react": "^1.10.1",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.1",
     "@mui/material": "^5.14.20",
     "dotenv": "^16.3.1",
     "firebaseui": "^6.1.0",
@@ -26,6 +27,7 @@
     "react-dom": "^18.2.0",
     "react-icons": "^4.12.0",
     "react-markdown": "^9.0.1",
+    "react-quiz-component": "^0.7.0",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.0",
     "socket.io-client": "^4.7.2"

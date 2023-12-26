@@ -5,6 +5,7 @@ import Profile from "./components/Profile";
 import Courses from "./components/Courses";
 import Create from "./components/Create";
 import Document from "./components/Document";
+import References from "./components/References";
 import { SnackbarProvider, enqueueSnackbar } from "notistack";
 
 import { initializeApp } from "firebase/app";
@@ -83,6 +84,7 @@ function App() {
   }, []);
 
   const [courses, setCourses] = useState([]);
+  const [ searchQueries, setSearchQuery ]= useState([])
 
   return (
     <main>
@@ -107,7 +109,11 @@ function App() {
             />
             <Route
               path="/courses/:id"
-              element={<Document user={user} auth={auth} socket={socket} courses={courses} />}
+              element={<Document user={user} auth={auth} socket={socket} courses={courses} searchQueries={searchQueries} setSearchQuery={setSearchQuery} />}
+            />
+            <Route
+              path="/courses/references/:id"
+              element={<References user={user} auth={auth} socket={socket} courses={courses} searchQueries={searchQueries} setSearchQuery={setSearchQuery} />}
             />
             <Route path="*" element={<Navigate to="/courses" />} />
           </Routes>

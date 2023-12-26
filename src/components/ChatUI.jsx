@@ -61,7 +61,7 @@ function ChatUI(props) {
           className="glass"
           name="chat"
           onSubmit={handleSubmit}
-          autocomplete="off"
+          autoComplete="off"
         >
           <textarea
             required
