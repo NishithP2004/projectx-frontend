@@ -23,14 +23,14 @@ jobs:
       uses: docker/login-action@v2
       with:
         registry: https://index.docker.io/v1/
-        username: ${{ secrets.AzureAppService_ContainerUsername_e0eb17740db648eab05848907365cc34 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_3c88c7c290a24be0bf1202b9994ccf4a }}
+        username: ${{ secrets.AzureAppService_ContainerUsername_ea925faf5c83477a89690607ee36fe09 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_f658ca9702704d44a1a9d04797926e52 }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_e0eb17740db648eab05848907365cc34 }}/projectx-frontend:${{ github.sha }}
+        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_ea925faf5c83477a89690607ee36fe09 }}/nishithp/projectx-frontend:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -47,5 +47,5 @@ jobs:
       with:
         app-name: 'projectx-frontend'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_e2bf7462774a42ae879ba77b83e92279 }}
-        images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_e0eb17740db648eab05848907365cc34 }}/projectx-frontend:${{ github.sha }}'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_10c58c680e314567aa4b9d7c194fbfb1 }}
+        images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_ea925faf5c83477a89690607ee36fe09 }}/nishithp/projectx-frontend:${{ github.sha }}'
