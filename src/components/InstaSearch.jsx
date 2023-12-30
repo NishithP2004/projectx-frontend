@@ -9,9 +9,46 @@ import GoogleIcon from "@mui/icons-material/Google";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import SendIcon from "@mui/icons-material/Send";
 import Quiz from "react-quiz-component";
+import BrowserDialog from "./BrowserDialog";
+import { enqueueSnackbar } from "notistack";
 
-function InstaSearch({ searchResultsWeb, searchResultsYT, quizContent }) {
+function InstaSearch({
+  searchResultsWeb,
+  searchResultsYT,
+  quizContent,
+  user,
+  auth,
+  socket,
+  messages,
+  setMessages,
+}) {
   const [value, setValue] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [websiteContent, setWebsiteContent] = useState(null);
+
+  const fetchWebsiteContent = async (url) => {
+    try {
+      const response = await fetch(
+        `/api/browser?aiEnhanced=${false}&url=${url}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      const data = await response.text();
+      return data;
+    } catch (error) {
+      console.error(error);
+      enqueueSnackbar(`An error occurred while fetching Quiz`, {
+        variant: "error",
+      });
+      return null;
+    }
+  };
 
   return (
     <div id="insta-search" className="glass">
@@ -23,7 +60,7 @@ function InstaSearch({ searchResultsWeb, searchResultsYT, quizContent }) {
                 <li>
                   <div className="card glass">
                     <div className="row">
-                      <img className="favicon" src={r.favicon} />
+                      <img className="favicon" src={r?.favicon} />
                       <div className="col">
                         <p className="title">{r.title}</p>
                         <p className="displayLink">
@@ -34,33 +71,56 @@ function InstaSearch({ searchResultsWeb, searchResultsYT, quizContent }) {
                         <p className="desc">{r.snippet}</p>
                         {/* {r.image? (<img src={r.image} className="image"/>): ""} */}
                       </div>
-                      <SendIcon />
+                      <button
+                        data-link={r.link}
+                        style={{
+                          backgroundColor: "transparent",
+                          border: "none",
+                        }}
+                        onClick={async (ev) => {
+                          let url = ev.currentTarget.getAttribute("data-link");
+                          enqueueSnackbar(
+                            `Web Page requested. The web page may take a few minutes to load.`,
+                            {
+                              variant: "info",
+                            },
+                          );
+                          setOpen(true);
+                          let content = await fetchWebsiteContent(url);
+                          if (content) setWebsiteContent(content);
+                        }}
+                      >
+                        <SendIcon />
+                      </button>
                     </div>
                   </div>
                 </li>
               );
             })
-          ) : searchResultsYT && searchResultsYT.length > 0 && quizContent.length > 0 && value == 1 ? (
+          ) : searchResultsYT &&
+            searchResultsYT?.length > 0 &&
+            quizContent.length > 0 &&
+            value == 1 ? (
             searchResultsYT.map((r) => {
-              let quizData = quizContent.filter(q => q.id == r.id)[0];
-              console.log(quizData)
-
-              let quiz = (quizData)? {
-                nrOfQuestions: "1",
-                questions: [
-                  {
-                    question: quizData?.question,
-                    questionType: "text",
-                    answerSelectionType: "single",
-                    answers: [...quizData?.options],
-                    correctAnswer: quizData?.key.toString(),
-                    messageForCorrectAnswer: "Correct answer. Good job.",
-                    messageForIncorrectAnswer:
-                      "Incorrect answer. Please try again.",
-                    point: "10",
-                  },
-                ],
-              }: null;
+              let quizData = quizContent.filter((q) => q.id == r.id)[0];
+              let quiz = quizData
+                ? {
+                    nrOfQuestions: "1",
+                    questions: [
+                      {
+                        question: quizData?.question,
+                        questionType: "text",
+                        answerSelectionType: "single",
+                        answers: [...quizData?.options],
+                        correctAnswer: quizData?.key.toString(),
+                        messageForCorrectAnswer: "Correct answer. Good job.",
+                        messageForIncorrectAnswer:
+                          "Incorrect answer. Please try again.",
+                        point: "10",
+                      },
+                    ],
+                  }
+                : null;
               return (
                 <li key={r.id}>
                   <div className="YT-card glass">
@@ -76,7 +136,7 @@ function InstaSearch({ searchResultsWeb, searchResultsYT, quizContent }) {
                         borderRadius: "16px",
                       }}
                     ></iframe>
-                    {quizData? <Quiz quiz={quiz} continueTillCorrect={true} shuffleAnswer={true} />: ""}
+                    {quizData ? <Quiz quiz={quiz} continueTillCorrect={true} /> : ""}
                   </div>
                 </li>
               );
@@ -89,6 +149,16 @@ function InstaSearch({ searchResultsWeb, searchResultsYT, quizContent }) {
             </Box>
           )}
         </ul>
+        <BrowserDialog
+          open={open}
+          setOpen={setOpen}
+          websiteContent={websiteContent}
+          user={user}
+          auth={auth}
+          socket={socket}
+          messages={messages}
+          setMessages={setMessages}
+        />
       </main>
       <footer>
         <Paper

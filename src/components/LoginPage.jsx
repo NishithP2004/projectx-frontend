@@ -49,6 +49,13 @@ export default function LoginPage(props) {
   return (
     <div className="loginPage glass">
       <h2>Project X | Login</h2>
+      {/* <p
+        style={{
+          marginTop: "10px"
+        }}
+      >
+        <em>The power of knowledge in the palm of your hands...</em>
+      </p> */}
       <div id="firebaseui-auth-container"></div>
       <div id="loader">
         <p>Loading...</p>

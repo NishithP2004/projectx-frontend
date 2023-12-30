@@ -25,12 +25,12 @@ function Create(props) {
             variant: "error",
           });
         else
-          enqueueSnackbar(`Course created successfully`, {
+          enqueueSnackbar(`Course creation initiated`, {
             variant: "success",
           });
       })
       .catch((err) => {
-        enqueueSnackbar(`An error occured`, {
+        enqueueSnackbar(`An error occured while creating the course`, {
           variant: "error",
         });
         console.error(err);
@@ -44,7 +44,7 @@ function Create(props) {
 
   return (
     <Layout user={props.user}>
-      <Section title="Create a Course">
+      <Section title="Create a Course 📑">
         <div
           className="glass container"
           style={{

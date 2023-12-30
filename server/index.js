@@ -6,10 +6,18 @@ const {
   instrument
 } = require("@socket.io/admin-ui");
 const http = require("http");
+const morgan = require('morgan')
 const admin = require("firebase-admin");
+const path = require('path')
+var serviceAccount = require("./project-x-92081-6c41507a6aa7.json");
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
+
+const BASE_URL = `https://projectx-backend.azurewebsites.net`
 const cors = require("cors");
 const multer = require("multer");
-const path = require('path')
+const generate_response = require('./chat.js')
 
 const upload = multer({
   limits: 50, // 50mb
@@ -24,16 +32,18 @@ app.use(
     extended: true
   })
 );
-
+app.use(morgan(":method :url :status - :remote-addr"));
+app.use(cors())
 app.use(express.static("public/dist"))
 
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 3000;
 
 const server = http.createServer(app);
 
 const io = require("socket.io")(server, {
   cors: ["https://admin.socket.io"],
   credentials: true,
+  maxHttpBufferSize: 1e8
 });
 
 instrument(io, {
@@ -52,7 +62,7 @@ app.get("/api", (req, res) => {
 app.get("/api/courses/list", async (req, res) => {
   try {
     let data = await fetch(
-        "https://projectx-backend.azurewebsites.net/api/courses/list", {
+        `${BASE_URL}/api/courses/list`, {
           headers: {
             Authorization: req.headers.authorization,
           },
@@ -68,7 +78,6 @@ app.get("/api/courses/list", async (req, res) => {
         });
       });
 
-    console.log(data);
     res.json(data);
   } catch (err) {
     if (err)
@@ -88,7 +97,7 @@ app.post("/api/courses/create", upload.single("file"), async (req, res) => {
     formData.append("file", blob, req.file.originalname);
 
     let data = await fetch(
-        "https://projectx-backend.azurewebsites.net/api/courses/create", {
+        `${BASE_URL}/api/courses/create`, {
           headers: {
             Authorization: req.headers.authorization
           },
@@ -105,7 +114,34 @@ app.post("/api/courses/create", upload.single("file"), async (req, res) => {
         });
       });
 
-    console.log(data);
+    res.json(data);
+  } catch (err) {
+    if (err)
+      res.status(500).send({
+        success: false,
+        error: err.message,
+      });
+  }
+});
+
+app.delete("/api/courses/:id", async (req, res) => {
+  try {
+    let data = await fetch(
+        `${BASE_URL}/api/courses/${req.params.id}`, {
+          headers: {
+            Authorization: req.headers.authorization
+          },
+          method: "DELETE",
+        },
+      )
+      .then((r) => r.json())
+      .catch((err) => {
+        console.log(err);
+        res.json({
+          success: false,
+          error: err.message,
+        });
+      });
     res.json(data);
   } catch (err) {
     if (err)
@@ -119,7 +155,7 @@ app.post("/api/courses/create", upload.single("file"), async (req, res) => {
 app.get("/api/courses/documents/:id", async (req, res) => {
   try {
     let data = await fetch(
-        `https://projectx-backend.azurewebsites.net/api/courses/documents/${req.params.id}`, {
+        `${BASE_URL}/api/courses/documents/${req.params.id}`, {
           headers: {
             Authorization: req.headers.authorization
           },
@@ -135,7 +171,6 @@ app.get("/api/courses/documents/:id", async (req, res) => {
         });
       });
 
-    console.log(data);
     res.json(data);
   } catch (err) {
     if (err)
@@ -151,7 +186,7 @@ app.post("/api/search-queries", async (req, res) => {
   console.log(content)
   try {
     let data = await fetch(
-        `https://projectx-backend.azurewebsites.net/api/search-queries`, {
+        `${BASE_URL}/api/search-queries`, {
           method: "POST",
           headers: {
             Authorization: req.headers.authorization
@@ -184,7 +219,7 @@ app.post("/api/quiz", async (req, res) => {
 
   try {
     let data = await fetch(
-        `https://projectx-backend.azurewebsites.net/api/quiz`, {
+        `${BASE_URL}/api/quiz`, {
           method: "POST",
           headers: {
             Authorization: req.headers.authorization
@@ -215,7 +250,7 @@ app.post("/api/quiz", async (req, res) => {
 app.get("/api/search", async (req, res) => {
   try {
     let data = await fetch(
-        `https://projectx-backend.azurewebsites.net/api/search?q=${req.query.q}&type=bing`, {
+        `${BASE_URL}/api/search?q=${req.query.q}&type=google`, {
           headers: {
             Authorization: req.headers.authorization
           },
@@ -244,7 +279,7 @@ app.get("/api/search", async (req, res) => {
 app.get("/api/reels", async (req, res) => {
   try {
     let data = await fetch(
-        `https://projectx-backend.azurewebsites.net/api/reels?q=${req.query.q}`, {
+        `${BASE_URL}/api/reels?q=${req.query.q}`, {
           headers: {
             Authorization: req.headers.authorization
           },
@@ -259,8 +294,34 @@ app.get("/api/reels", async (req, res) => {
           error: err.message,
         });
       });
-      
+
     res.json(data);
+  } catch (err) {
+    if (err)
+      res.status(500).send({
+        success: false,
+        error: err.message,
+      });
+  }
+});
+
+app.get("/api/browser", async (req, res) => {
+  try {
+    let data = await fetch(
+        `${BASE_URL}/api/browser?url=${req.query.url}`, {
+          headers: {
+            Authorization: req.headers.authorization
+          },
+          method: "GET"
+        }
+      )
+      .then((r) => r.text())
+      .catch((err) => {
+        console.log(err);
+        res.send(data);
+      });
+
+    res.send(data);
   } catch (err) {
     if (err)
       res.status(500).send({
@@ -274,13 +335,40 @@ app.get("*", (req, res) => {
   res.sendFile(path.resolve("public", "dist", "index.html"))
 })
 
+// Socket IO
 io.on("connection", (client) => {
   console.log(`Connected to ${client.id}`);
-  client.on('message', (data, callback) => {
-    console.log(data)
-    callback({
-      msg: "Hello World",
-      from: 'AI'
-    })
-  })
+
+  client.on('message', async (data, callback) => {
+    try {
+      let res = "";
+      if (!data.token)
+        res = "401 Unauthorized";
+      else {
+        let user = await admin.auth().verifyIdToken(data.token)
+          .catch(err => {
+            if (err) {
+              res = "403 Forbidden";
+              callback({
+                msg: res,
+                from: 'AI'
+              });
+            }
+          });
+        if (user.uid) {
+          res = await generate_response(data.data.msg, (data.data.queryMultipleDocs === true? undefined: data.data.course), user.uid, data.data.context);
+          console.log("AI Response: " + res);
+        }
+      }
+      callback({
+        msg: res,
+        from: 'AI'
+      });
+    } catch (err) {
+      callback({
+        msg: err.message,
+        from: "AI"
+      })
+    }
+  });
 });

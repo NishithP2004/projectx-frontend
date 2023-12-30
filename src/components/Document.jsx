@@ -58,6 +58,8 @@ function Document({
   courses,
   searchQueries,
   setSearchQuery,
+  messages,
+  setMessages,
 }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
@@ -97,7 +99,7 @@ function Document({
 
   return (
     <Layout user={user}>
-      <Section title="Document Reader">
+      <Section title="Document Reader 📄">
         <div
           classNme="glass container"
           style={{
@@ -112,7 +114,13 @@ function Document({
           }}
         >
           <MarkdownRenderer content={content} />
-          <ChatUI user={user} auth={auth} socket={socket} />
+          <ChatUI
+            user={user}
+            auth={auth}
+            socket={socket}
+            messages={messages}
+            setMessages={setMessages}
+          />
         </div>
       </Section>
     </Layout>

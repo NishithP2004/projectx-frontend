@@ -6,7 +6,7 @@
 
 **/.classpath
 **/.dockerignore
-**/.env
+# **/.env
 **/.git
 **/.gitignore
 **/.project
@@ -33,3 +33,4 @@
 LICENSE
 README.md
 projectx-backend
+# server/project-x-92081-6c41507a6aa7.json

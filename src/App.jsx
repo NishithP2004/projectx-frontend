@@ -83,8 +83,9 @@ function App() {
     };
   }, []);
 
-  const [courses, setCourses] = useState([]);
+  const [courses, setCourses] = useState(null);
   const [ searchQueries, setSearchQuery ]= useState([])
+  const [messages, setMessages] = useState([])
 
   return (
     <main>
@@ -109,11 +110,11 @@ function App() {
             />
             <Route
               path="/courses/:id"
-              element={<Document user={user} auth={auth} socket={socket} courses={courses} searchQueries={searchQueries} setSearchQuery={setSearchQuery} />}
+              element={<Document user={user} auth={auth} socket={socket} courses={courses} searchQueries={searchQueries} setSearchQuery={setSearchQuery} messages={messages} setMessages={setMessages} />}
             />
             <Route
               path="/courses/references/:id"
-              element={<References user={user} auth={auth} socket={socket} courses={courses} searchQueries={searchQueries} setSearchQuery={setSearchQuery} />}
+              element={<References user={user} auth={auth} socket={socket} courses={courses} searchQueries={searchQueries} setSearchQuery={setSearchQuery} messages={messages} setMessages={setMessages} />}
             />
             <Route path="*" element={<Navigate to="/courses" />} />
           </Routes>

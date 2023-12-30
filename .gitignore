@@ -13,6 +13,8 @@ dist-ssr
 *.local
 server/node_modules
 server/uploads
+server/project-x-92081-6c41507a6aa7.json
+server/.env
 
 # Editor directories and files
 .vscode/*

@@ -32,13 +32,21 @@ const fetchQuizContent = async (transcript) => {
   }
 };
 
-function References({ user, auth, socket, courses, searchQueries }) {
+function References({
+  user,
+  auth,
+  socket,
+  courses,
+  searchQueries,
+  messages,
+  setMessages,
+}) {
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
   const [content, setContent] = useState(null);
   const [searchResultsWeb, setSearchResultWeb] = useState([]);
   const [searchResultsYT, setSearchResultYT] = useState([]);
-  const [quizContent, setQuizContent] = useState([])
+  const [quizContent, setQuizContent] = useState([]);
 
   useEffect(() => {
     if (searchQueries?.length == 0) return;
@@ -47,7 +55,7 @@ function References({ user, auth, socket, courses, searchQueries }) {
         await fetch(
           `/api/search?q=${
             searchQueries[Math.floor(Math.random() * searchQueries.length)]
-          }&type=bing`,
+          }`,
           {
             method: "GET",
             headers: {
@@ -102,23 +110,25 @@ function References({ user, auth, socket, courses, searchQueries }) {
 
   useEffect(() => {
     try {
-      if(searchResultsYT.length == 0) return;
+      if (searchResultsYT.length == 0) return;
 
-      (async function() {
-        let quiz = await Promise.all(searchResultsYT.map(async r => {
-          return { id: r.id, ...await fetchQuizContent(r.transcript) }
-        }))
-        console.log(quiz)
-        setQuizContent(quiz)
+      (async function () {
+        let quiz = await Promise.all(
+          searchResultsYT.map(async (r) => {
+            return { id: r.id, ...(await fetchQuizContent(r.transcript)) };
+          }),
+        );
+
+        setQuizContent(quiz.filter((q) => q.question && q.key));
       })();
-    } catch(err) {
+    } catch (err) {
       console.error(err);
-        enqueueSnackbar(`An error occured`, {
-          variant: "error",
-        });
-        console.error(err);
+      enqueueSnackbar(`An error occured`, {
+        variant: "error",
+      });
+      console.error(err);
     }
-  }, [searchResultsYT])
+  }, [searchResultsYT]);
 
   return (
     <Layout user={user}>
@@ -140,8 +150,19 @@ function References({ user, auth, socket, courses, searchQueries }) {
             searchResultsWeb={searchResultsWeb}
             searchResultsYT={searchResultsYT}
             quizContent={quizContent}
+            user={user}
+            auth={auth}
+            socket={socket}
+            messages={messages}
+            setMessages={setMessages}
           />
-          <ChatUI user={user} auth={auth} socket={socket} />
+          {/* <ChatUI
+            user={user}
+            auth={auth}
+            socket={socket}
+            messages={messages}
+            setMessages={setMessages}
+          /> */}
         </div>
       </Section>
     </Layout>

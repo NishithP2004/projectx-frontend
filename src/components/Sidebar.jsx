@@ -30,7 +30,7 @@ function Sidebar() {
             <IconButton
               style={{
                 fontSize: "1em",
-                color: "brown",
+                color: "#3498DB",
               }}
             >
               <FaPlusCircle />

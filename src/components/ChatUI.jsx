@@ -6,12 +6,14 @@ function ChatUI(props) {
 
   const handleSubmit = (ev) => {
     ev.preventDefault();
-    let form = document.forms[0];
+    let form = document.forms[document.forms.length-1];
     let msg = form["message"].value;
     let data = {
       msg,
       from: props.user.name,
       queryMultipleDocs: form["multipleDocs"].checked,
+      course: localStorage.getItem("course_id"),
+      context: (props.context)? props.context: null
     };
     handleMessage(data);
     form["message"].value = "";
@@ -19,8 +21,9 @@ function ChatUI(props) {
     socket.emit(
       "message",
       {
-        data,
         id: socket.id,
+        token: sessionStorage.getItem("token"),
+        data,
       },
       (data) => {
         handleMessage(data);
@@ -34,11 +37,16 @@ function ChatUI(props) {
     let chat = document.querySelector("#chat-container > ul");
     let li = document.createElement("li");
     li.innerHTML = `
-<div class='bubble glass ${data.from !== "AI" ? "me" : "ai"}'>
-    <p class='from'>${data.from}</p>
-    <p class='msg'>${data.msg}</p> 
-</div>
-`;
+      <div class='bubble glass ${data.from !== "AI" ? "me" : "ai"}'>
+        <p class='from'>${data.from}</p>
+        <p class='msg'>${data.msg}</p> 
+      </div>
+    `;
+    // props.setMessages([...props.messages, {
+    //   from: data.from,
+    //   message: data.msg,
+    //   timestamp: new Date().getTime()
+    // }])
     chat.appendChild(li);
     chat.scrollTo(0, chat.scrollHeight);
   }
