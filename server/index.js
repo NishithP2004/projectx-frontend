@@ -36,7 +36,7 @@ app.use(morgan(":method :url :status - :remote-addr"));
 app.use(cors())
 app.use(express.static("public/dist"))
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 80;
 
 const server = http.createServer(app);
 
