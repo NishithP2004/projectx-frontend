@@ -28,16 +28,13 @@ function InstaSearch({
 
   const fetchWebsiteContent = async (url) => {
     try {
-      const response = await fetch(
-        `/api/browser?aiEnhanced=${false}&url=${url}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
+      const response = await fetch(`/api/browser?url=${url}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          "Content-Type": "application/json",
         },
-      );
+      });
 
       const data = await response.text();
       return data;
@@ -55,9 +52,9 @@ function InstaSearch({
       <main className="glass">
         <ul id="search-results">
           {searchResultsWeb && searchResultsWeb.length > 0 && value == 0 ? (
-            searchResultsWeb.map((r) => {
+            searchResultsWeb.map((r, index) => {
               return (
-                <li>
+                <li key={index}>
                   <div className="card glass">
                     <div className="row">
                       <img className="favicon" src={r?.favicon} />
@@ -136,7 +133,11 @@ function InstaSearch({
                         borderRadius: "16px",
                       }}
                     ></iframe>
-                    {quizData ? <Quiz quiz={quiz} continueTillCorrect={true} /> : ""}
+                    {quizData ? (
+                      <Quiz quiz={quiz} continueTillCorrect={true} />
+                    ) : (
+                      ""
+                    )}
                   </div>
                 </li>
               );

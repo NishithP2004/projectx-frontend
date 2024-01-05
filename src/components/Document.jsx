@@ -60,10 +60,11 @@ function Document({
   setSearchQuery,
   messages,
   setMessages,
+  content,
+  setContent,
 }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
-  const [content, setContent] = useState(null);
 
   useEffect(() => {
     const fetchDocument = async () => {
@@ -74,13 +75,22 @@ function Document({
         )[0].docs[0];
 
         const documentContent = await fetchDocumentContent(docId);
-        setContent(documentContent);
+        setContent((prevContent) => {
+          return [
+            ...prevContent,
+            {
+              id: localStorage.getItem("course_id"),
+              content: documentContent,
+            },
+          ];
+        });
       } catch (error) {
         console.error(error);
       }
     };
 
-    fetchDocument();
+    if (!content.find((d) => d.id == localStorage.getItem("course_id")))
+      fetchDocument();
   }, []);
 
   useEffect(() => {
@@ -101,7 +111,7 @@ function Document({
     <Layout user={user}>
       <Section title="Document Reader 📄">
         <div
-          classNme="glass container"
+          className="glass container"
           style={{
             marginTop: "10px",
             width: "100%",
@@ -113,7 +123,12 @@ function Document({
             flexDirection: "row",
           }}
         >
-          <MarkdownRenderer content={content} />
+          <MarkdownRenderer
+            content={
+              content.find((d) => d.id == localStorage.getItem("course_id"))
+                ?.content
+            }
+          />
           <ChatUI
             user={user}
             auth={auth}

@@ -91,7 +91,7 @@ function Courses({ user, courses, setCourses }) {
                       if (confirmation)
                         await deleteCourse(id).then(() => {
                           enqueueSnackbar(`Course deletion initiated`, {
-                            variant: "success",
+                            variant: "info",
                           });
                           window.location.reload();
                         });

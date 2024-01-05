@@ -45,7 +45,7 @@ const client = new MongoClient(process.env.MONGO_CONNECTION_URL)
 const namespace = process.env.MONGO_NAMESPACE;
 const [dbName, ] = namespace.split(".");
 
-(async function() {
+(async function () {
     await client.connect();
     console.log("Connected successfully to Cosmos DB")
 })();
@@ -68,7 +68,12 @@ const vectorstore = new AzureCosmosDBVectorStore(new GooglePaLMEmbeddings({
 const model = new GoogleVertexAI({
     model: "text-bison-32k",
     temperature: 0.2
-}) 
+})
+
+const preprocessorModel = new ChatGoogleGenerativeAI({
+    modelName: "gemini-pro",
+    apiKey: process.env.GOOGLE_PALM_API_KEY
+})
 
 const questionPrompt = PromptTemplate.fromTemplate(
     `
@@ -78,6 +83,8 @@ const questionPrompt = PromptTemplate.fromTemplate(
   Guidelines: Use the context provided as a reference and provide a crisp and short to the point answer to the question provided below. 
               Do not just provide the context as the answer, transform it using your intelligence.
               Strictly Answer to the question which is included below.
+              Ask yourself a question, does the gnerated result answer the question entirely or is the answer deviating from the question. 
+              If the answer is deviating from the question then regenerate the answer until you arrive at the right answer.
               IMPORTANT: Headings begin from level 3 (h3).
                          Return the file directly without backticks.
   ----------------
@@ -91,44 +98,51 @@ const questionPrompt = PromptTemplate.fromTemplate(
 );
 
 async function generate_response(question, course, user, context) {
+    console.log("User:", user)
+    console.log("Q: " + question)
 
     const retriever = vectorstore.asRetriever({
         searchType: "mmr",
         searchKwargs: {
-            fetchK: 5,
+            fetchK: 2,
             lambda: 0.1
         },
         filter: {
-            "compound": {
-                "must": [{
-                        "term": {
-                            "path": "user",
-                            "query": user // Replace 'user' with the actual user value
-                        }
-                    },
-                    course?
-                    {
-                        "term": {
-                            "path": "course",
-                            "query": course // Replace 'course' with the actual course value
-                        }
-                    }: null
-                ].filter(Boolean)
+            preFilter: {
+                "compound": {
+                    "must": [{
+                            "text": {
+                                "path": "user",
+                                "query": user
+                            }
+                        },
+                        course ? {
+                            "text": {
+                                "path": "course",
+                                "query": course
+                            }
+                        } : null
+                    ].filter(Boolean)
+                }
             }
         }
     })
     const chain = RunnableSequence.from([{
             question: (input => {
                 input.question
-                console.log(input.question)
             }),
             chatHistory: (input) => input.chatHistory || "",
             context: async (input) => {
-                if(!input.context) {
-                    const relevantDocs = await retriever.getRelevantDocuments(input.question);
+                if (!input.context) {
+                    const semantics = (question) ? (await preprocessorModel.invoke(`Please list the semantic keywords associated with the following user query. Return as a comma-separated list
+                                                INPUT: ${question}`)).content : question;
+                    console.log("Semantics: " + semantics);
+                    const relevantDocs = (await retriever.getRelevantDocuments(semantics? semantics.toString() : question)).filter(d => (!course)? d.metadata.user === user: (d.metadata.user == user && d.metadata.course === course));
+
                     const serialized = formatDocumentsAsString(relevantDocs)
+                    console.log("Serialized Context: " + serialized)
                     return serialized;
-                } else 
+                } else
                     return input.context;
             }
         },
@@ -142,7 +156,7 @@ async function generate_response(question, course, user, context) {
         context: context
     })
 
-    let md = (result.trim().startsWith("`") == true ? result.slice("```".length + 1, -('```'.length)): result);
+    let md = (result.trim().startsWith("`") == true ? result.slice("```".length + 1, -('```'.length)) : result);
     return markdown.toHTML(md)
 }
 

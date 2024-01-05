@@ -1,7 +1,5 @@
 const express = require("express");
-require("dotenv").config({
-  path: "../.env",
-});
+require("dotenv").config();
 const {
   instrument
 } = require("@socket.io/admin-ui");
@@ -14,7 +12,7 @@ admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
 
-const BASE_URL = `https://projectx-backend.azurewebsites.net`
+const BASE_URL = process.env.BASE_URL
 const cors = require("cors");
 const multer = require("multer");
 const generate_response = require('./chat.js')
@@ -33,10 +31,10 @@ app.use(
   })
 );
 app.use(morgan(":method :url :status - :remote-addr"));
-app.use(cors())
-app.use(express.static("public/dist"))
+// app.use(cors())
+// app.use(express.static("public/dist"))
 
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 3000;
 
 const server = http.createServer(app);
 
@@ -250,7 +248,7 @@ app.post("/api/quiz", async (req, res) => {
 app.get("/api/search", async (req, res) => {
   try {
     let data = await fetch(
-        `${BASE_URL}/api/search?q=${req.query.q}&type=google`, {
+        `${BASE_URL}/api/search?q=${req.query.q}&type=${req.query.type? req.query.type : "google"}`, {
           headers: {
             Authorization: req.headers.authorization
           },
@@ -308,7 +306,7 @@ app.get("/api/reels", async (req, res) => {
 app.get("/api/browser", async (req, res) => {
   try {
     let data = await fetch(
-        `${BASE_URL}/api/browser?url=${req.query.url}`, {
+        `${BASE_URL}/api/browser?${Boolean(req.query.aiEnhanced)? "aiEnhanced=" + req.query.aiEnhanced + "&": ""}url=${req.query.url}`, {
           headers: {
             Authorization: req.headers.authorization
           },
@@ -331,9 +329,9 @@ app.get("/api/browser", async (req, res) => {
   }
 });
 
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve("public", "dist", "index.html"))
-})
+// app.get("*", (req, res) => {
+//   res.sendFile(path.resolve("public", "dist", "index.html"))
+// })
 
 // Socket IO
 io.on("connection", (client) => {
@@ -369,6 +367,33 @@ io.on("connection", (client) => {
         msg: err.message,
         from: "AI"
       })
+    }
+  });
+
+  client.on('message-java', async (data) => {
+    try {
+      let res = "";
+      if (!data.token)
+        res = "401 Unauthorized";
+      else {
+        console.log(data)
+        let user = await admin.auth().verifyIdToken(data.token)
+          .catch(err => {
+            if (err) {
+              res = "403 Forbidden";
+              io.to(client.id).emit("reply-java", res);
+            }
+          });
+        if (user.uid) {
+          res = await generate_response(data.data.msg, (data.data.queryMultipleDocs === true? undefined: data.data.course), user.uid, data.data.context);
+          console.log("AI Response: " + res);
+        }
+      }
+      console.log(res)
+      io.to(client.id).emit("reply-java", res);
+    } catch (err) {
+      console.log(err.message)
+      io.to(client.id).emit("reply-java", err.message)
     }
   });
 });

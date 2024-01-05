@@ -134,7 +134,7 @@ function References({
     <Layout user={user}>
       <Section title="References 🌐">
         <div
-          classNme="glass container"
+          className="glass container"
           style={{
             marginTop: "10px",
             width: "100%",
