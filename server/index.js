@@ -31,8 +31,8 @@ app.use(
   })
 );
 app.use(morgan(":method :url :status - :remote-addr"));
-// app.use(cors())
-// app.use(express.static("public/dist"))
+app.use(cors())
+app.use(express.static("public/dist"))
 
 const PORT = process.env.PORT || 3000;
 
@@ -329,9 +329,9 @@ app.get("/api/browser", async (req, res) => {
   }
 });
 
-// app.get("*", (req, res) => {
-//   res.sendFile(path.resolve("public", "dist", "index.html"))
-// })
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve("public", "dist", "index.html"))
+})
 
 // Socket IO
 io.on("connection", (client) => {

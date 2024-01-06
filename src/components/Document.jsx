@@ -94,11 +94,11 @@ function Document({
   }, []);
 
   useEffect(() => {
-    if (!content) return;
+    if (!content.find((d) => d.id == localStorage.getItem("course_id"))) return;
 
     const updateSearch = async () => {
       try {
-        await updateSearchQueries(content, setSearchQuery);
+        await updateSearchQueries(content.find((d) => d.id == localStorage.getItem("course_id"))?.content, setSearchQuery);
       } catch (error) {
         console.error(error);
       }
