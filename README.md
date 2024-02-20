@@ -1,3 +1,6 @@
+# Project X
+> _The power of knowledge in the palm of your hands..._
+
 ## Execution Steps
 
 1. **Clone Frontend Repository:** 
