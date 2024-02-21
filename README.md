@@ -1,4 +1,7 @@
 # Project X
+
+[![Watch the video](http://i3.ytimg.com/vi/zqVGD1JXp5A/hqdefault.jpg)](https://youtu.be/zqVGD1JXp5A)
+
 > _The power of knowledge in the palm of your hands..._
 
 ## Execution Steps
@@ -70,7 +73,8 @@ PORT=
 # BASE_URL=
 BASE_URL="http://localhost:7071"
 ```
-
+## Architecture
+![Slide9](https://github.com/NishithP2004/projectx-frontend/assets/34577844/6627ac8a-0653-44bc-b6c9-af4777da391c)
 ---
 
 ## Live Deployment URL
