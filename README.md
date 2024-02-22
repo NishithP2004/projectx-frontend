@@ -9,13 +9,13 @@
 1. **Clone Frontend Repository:** 
    - Clone the frontend repository from GitHub using the following command:
      ```bash
-     git clone https://github.com/NishithP2004/projectx-frontend
+     git clone https://github.com/NishithP2004/projectx-frontend.git
      ```
 
 2. **Clone Backend Repository:** 
    - Similarly, clone the backend repository from GitHub:
      ```bash
-     git clone https://github.com/NishithP2004/projectx-backend
+     git clone https://github.com/NishithP2004/projectx-backend.git
      ```
 
 3. **Navigate to Frontend Directory:** 
