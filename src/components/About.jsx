@@ -20,13 +20,29 @@ function About(props) {
           }}
         >
           <div id="about" className="glass">
-            <h3>
-              <b>
-                Project X is an innovative learning platform that empowers users
-                to effortlessly gather relevant information from the web related
-                to a document, without any user prompts or search queries.
-              </b>
-            </h3>
+            <div className="col">
+              <h3>
+                <b>
+                  Project X is an innovative learning platform that empowers
+                  users to effortlessly gather relevant information from the web
+                  related to a document, without any user prompts or search
+                  queries.
+                </b>
+              </h3>
+              <br />
+              <iframe
+                width="560"
+                height="315"
+                src="https://www.youtube.com/embed/8hkmccSy68s?si=wdMugI-GK--_qrnP"
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                style={{
+                  borderRadius: "10px",
+                }}
+              ></iframe>
+            </div>
             <ul>
               <li>
                 Project X aims to unify references and data from various

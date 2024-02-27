@@ -47,8 +47,14 @@ function BrowserDialog({
           </IconButton>
         </div>
       </DialogTitle>
-      <DialogContent>
-        <div className="row">
+      <DialogContent style={{ display: "flex", flexDirection: "column" }}>
+        <div
+          className="row"
+          style={{
+            flex: 1,
+            alignItems: "center",
+          }}
+        >
           <MarkdownRenderer
             content={websiteContent}
             style={{

@@ -51,3 +51,10 @@
 #create-course input {
   margin-bottom: 5px;
 }
+
+#create-course .upload-info {
+  text-align: left;
+  font-family: "Quicksand", sans-serif;
+  font-size: small;
+  width: 80%;
+}

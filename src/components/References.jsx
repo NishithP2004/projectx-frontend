@@ -94,7 +94,9 @@ function References({
           },
         )
           .then((res) => res.json())
-          .then((res) => setSearchResultYT(res.result))
+          .then((res) => {
+            setSearchResultYT(res.result);
+          })
           .catch((err) => {
             if (err) throw err;
           });
@@ -119,7 +121,7 @@ function References({
           }),
         );
 
-        setQuizContent(quiz.filter((q) => q.question && q.key));
+        setQuizContent(quiz.filter((q) => q && q.question && q.key !== null));
       })();
     } catch (err) {
       console.error(err);

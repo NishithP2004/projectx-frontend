@@ -82,6 +82,11 @@ function Create(props) {
               id="file"
               required
             />
+            <p className="upload-info">
+              File number limit: 1 <br />
+              Single file size limit: 4MB <br />
+              Allowed file types: Word, Excel, PPT, PDF, Image
+            </p>
             <div
               className="row"
               style={{

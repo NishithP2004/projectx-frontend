@@ -13,6 +13,15 @@
   color: darkslategray;
 }
 
+#markdown-container ul,
+#markdown-container ol {
+  margin-left: 20px;
+}
+
+#markdown-container * {
+  margin: 10px auto;
+}
+
 #markdown-container::-webkit-scrollbar {
   display: none;
 }

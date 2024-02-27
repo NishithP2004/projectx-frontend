@@ -1,24 +1,22 @@
 const express = require("express");
 require("dotenv").config();
-const {
-  instrument
-} = require("@socket.io/admin-ui");
+const { instrument } = require("@socket.io/admin-ui");
 const http = require("http");
-const morgan = require('morgan')
+const morgan = require("morgan");
 const admin = require("firebase-admin");
-const path = require('path')
+const path = require("path");
 var serviceAccount = require("./project-x-92081-6c41507a6aa7.json");
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount),
 });
 
-const BASE_URL = process.env.BASE_URL
+const BASE_URL = process.env.BASE_URL;
 const cors = require("cors");
 const multer = require("multer");
-const generate_response = require('./chat.js')
+const generate_response = require("./chat.js");
 
 const upload = multer({
-  limits: 50, // 50mb
+  limits: 4, // 4mb
 });
 
 const app = express();
@@ -27,12 +25,12 @@ app.use(express.json());
 
 app.use(
   express.urlencoded({
-    extended: true
-  })
+    extended: true,
+  }),
 );
 app.use(morgan(":method :url :status - :remote-addr"));
-app.use(cors())
-app.use(express.static("public/dist"))
+app.use(cors());
+app.use(express.static("public/dist"));
 
 const PORT = process.env.PORT || 3000;
 
@@ -41,7 +39,7 @@ const server = http.createServer(app);
 const io = require("socket.io")(server, {
   cors: ["https://admin.socket.io"],
   credentials: true,
-  maxHttpBufferSize: 1e8
+  maxHttpBufferSize: 1e8,
 });
 
 instrument(io, {
@@ -59,14 +57,12 @@ app.get("/api", (req, res) => {
 
 app.get("/api/courses/list", async (req, res) => {
   try {
-    let data = await fetch(
-        `${BASE_URL}/api/courses/list`, {
-          headers: {
-            Authorization: req.headers.authorization,
-          },
-          method: "GET",
-        },
-      )
+    let data = await fetch(`${BASE_URL}/api/courses/list`, {
+      headers: {
+        Authorization: req.headers.authorization,
+      },
+      method: "GET",
+    })
       .then((r) => r.json())
       .catch((err) => {
         console.log(err);
@@ -94,15 +90,13 @@ app.post("/api/courses/create", upload.single("file"), async (req, res) => {
     const blob = new Blob([req.file.buffer]);
     formData.append("file", blob, req.file.originalname);
 
-    let data = await fetch(
-        `${BASE_URL}/api/courses/create`, {
-          headers: {
-            Authorization: req.headers.authorization
-          },
-          body: formData,
-          method: "POST",
-        },
-      )
+    let data = await fetch(`${BASE_URL}/api/courses/create`, {
+      headers: {
+        Authorization: req.headers.authorization,
+      },
+      body: formData,
+      method: "POST",
+    })
       .then((r) => r.json())
       .catch((err) => {
         console.log(err);
@@ -124,14 +118,12 @@ app.post("/api/courses/create", upload.single("file"), async (req, res) => {
 
 app.delete("/api/courses/:id", async (req, res) => {
   try {
-    let data = await fetch(
-        `${BASE_URL}/api/courses/${req.params.id}`, {
-          headers: {
-            Authorization: req.headers.authorization
-          },
-          method: "DELETE",
-        },
-      )
+    let data = await fetch(`${BASE_URL}/api/courses/${req.params.id}`, {
+      headers: {
+        Authorization: req.headers.authorization,
+      },
+      method: "DELETE",
+    })
       .then((r) => r.json())
       .catch((err) => {
         console.log(err);
@@ -153,13 +145,14 @@ app.delete("/api/courses/:id", async (req, res) => {
 app.get("/api/courses/documents/:id", async (req, res) => {
   try {
     let data = await fetch(
-        `${BASE_URL}/api/courses/documents/${req.params.id}`, {
-          headers: {
-            Authorization: req.headers.authorization
-          },
-          method: "GET"
-        }
-      )
+      `${BASE_URL}/api/courses/documents/${req.params.id}`,
+      {
+        headers: {
+          Authorization: req.headers.authorization,
+        },
+        method: "GET",
+      },
+    )
       .then((r) => r.json())
       .catch((err) => {
         console.log(err);
@@ -180,20 +173,19 @@ app.get("/api/courses/documents/:id", async (req, res) => {
 });
 
 app.post("/api/search-queries", async (req, res) => {
-  const content = req.body.content
-  console.log(content)
+  const doc_id = req.body.doc_id;
+  // console.log(content);
   try {
-    let data = await fetch(
-        `${BASE_URL}/api/search-queries`, {
-          method: "POST",
-          headers: {
-            Authorization: req.headers.authorization
-          },
-          body: JSON.stringify({
-            content: content
-          })
-        }
-      )
+    let data = await fetch(`${BASE_URL}/api/search-queries`, {
+      method: "POST",
+      headers: {
+        Authorization: req.headers.authorization,
+      },
+      body: JSON.stringify({
+        // content: content,
+        doc_id: doc_id,
+      }),
+    })
       .then((r) => r.json())
       .catch((err) => {
         console.log(err);
@@ -213,20 +205,18 @@ app.post("/api/search-queries", async (req, res) => {
 });
 
 app.post("/api/quiz", async (req, res) => {
-  const transcript = req.body.transcript
+  const transcript = req.body.transcript;
 
   try {
-    let data = await fetch(
-        `${BASE_URL}/api/quiz`, {
-          method: "POST",
-          headers: {
-            Authorization: req.headers.authorization
-          },
-          body: JSON.stringify({
-            transcript: transcript
-          })
-        }
-      )
+    let data = await fetch(`${BASE_URL}/api/quiz`, {
+      method: "POST",
+      headers: {
+        Authorization: req.headers.authorization,
+      },
+      body: JSON.stringify({
+        transcript: transcript,
+      }),
+    })
       .then((r) => r.json())
       .catch((err) => {
         console.log(err);
@@ -248,13 +238,16 @@ app.post("/api/quiz", async (req, res) => {
 app.get("/api/search", async (req, res) => {
   try {
     let data = await fetch(
-        `${BASE_URL}/api/search?q=${req.query.q}&type=${req.query.type? req.query.type : "google"}`, {
-          headers: {
-            Authorization: req.headers.authorization
-          },
-          method: "GET"
-        }
-      )
+      `${BASE_URL}/api/search?q=${req.query.q}&type=${
+        req.query.type ? req.query.type : "google"
+      }`,
+      {
+        headers: {
+          Authorization: req.headers.authorization,
+        },
+        method: "GET",
+      },
+    )
       .then((r) => r.json())
       .catch((err) => {
         console.log(err);
@@ -276,14 +269,12 @@ app.get("/api/search", async (req, res) => {
 
 app.get("/api/reels", async (req, res) => {
   try {
-    let data = await fetch(
-        `${BASE_URL}/api/reels?q=${req.query.q}`, {
-          headers: {
-            Authorization: req.headers.authorization
-          },
-          method: "GET"
-        }
-      )
+    let data = await fetch(`${BASE_URL}/api/reels?q=${req.query.q}`, {
+      headers: {
+        Authorization: req.headers.authorization,
+      },
+      method: "GET",
+    })
       .then((r) => r.json())
       .catch((err) => {
         console.log(err);
@@ -306,13 +297,18 @@ app.get("/api/reels", async (req, res) => {
 app.get("/api/browser", async (req, res) => {
   try {
     let data = await fetch(
-        `${BASE_URL}/api/browser?${Boolean(req.query.aiEnhanced)? "aiEnhanced=" + req.query.aiEnhanced + "&": ""}url=${req.query.url}`, {
-          headers: {
-            Authorization: req.headers.authorization
-          },
-          method: "GET"
-        }
-      )
+      `${BASE_URL}/api/browser?${
+        Boolean(req.query.aiEnhanced)
+          ? "aiEnhanced=" + req.query.aiEnhanced + "&"
+          : ""
+      }url=${req.query.url}`,
+      {
+        headers: {
+          Authorization: req.headers.authorization,
+        },
+        method: "GET",
+      },
+    )
       .then((r) => r.text())
       .catch((err) => {
         console.log(err);
@@ -330,70 +326,82 @@ app.get("/api/browser", async (req, res) => {
 });
 
 app.get("*", (req, res) => {
-  res.sendFile(path.resolve("public", "dist", "index.html"))
-})
+  res.sendFile(path.resolve("public", "dist", "index.html"));
+});
 
 // Socket IO
 io.on("connection", (client) => {
   console.log(`Connected to ${client.id}`);
 
-  client.on('message', async (data, callback) => {
+  client.on("message", async (data, callback) => {
     try {
       let res = "";
-      if (!data.token)
-        res = "401 Unauthorized";
+      if (!data.token) res = "401 Unauthorized";
       else {
-        let user = await admin.auth().verifyIdToken(data.token)
-          .catch(err => {
+        let user = await admin
+          .auth()
+          .verifyIdToken(data.token)
+          .catch((err) => {
             if (err) {
               res = "403 Forbidden";
               callback({
                 msg: res,
-                from: 'AI'
+                from: "AI",
               });
             }
           });
         if (user.uid) {
-          res = await generate_response(data.data.msg, (data.data.queryMultipleDocs === true? undefined: data.data.course), user.uid, data.data.context);
+          res = await generate_response(
+            data.data.msg,
+            data.data.queryMultipleDocs === true ? undefined : data.data.course,
+            user.uid,
+            data.data.context,
+          );
           console.log("AI Response: " + res);
         }
       }
       callback({
         msg: res,
-        from: 'AI'
+        from: "AI",
       });
     } catch (err) {
       callback({
         msg: err.message,
-        from: "AI"
-      })
+        from: "AI",
+      });
     }
   });
 
-  client.on('message-java', async (data) => {
+  client.on("message-java", async (data) => {
     try {
       let res = "";
-      if (!data.token)
-        res = "401 Unauthorized";
+      if (!data.token) res = "401 Unauthorized";
       else {
-        console.log(data)
-        let user = await admin.auth().verifyIdToken(data.token)
-          .catch(err => {
+        console.log(data);
+        let user = await admin
+          .auth()
+          .verifyIdToken(data.token)
+          .catch((err) => {
             if (err) {
               res = "403 Forbidden";
               io.to(client.id).emit("reply-java", res);
             }
           });
         if (user.uid) {
-          res = await generate_response(data.data.msg, (data.data.queryMultipleDocs === true? undefined: data.data.course), user.uid, data.data.context);
+          res = await generate_response(
+            data.data.msg,
+            data.data.queryMultipleDocs === true ? undefined : data.data.course,
+            user.uid,
+            data.data.context,
+          );
           console.log("AI Response: " + res);
         }
       }
-      console.log(res)
+      console.log(res);
       io.to(client.id).emit("reply-java", res);
     } catch (err) {
-      console.log(err.message)
-      io.to(client.id).emit("reply-java", err.message)
+      console.log(err.message);
+      io.to(client.id).emit("reply-java", err.message);
     }
   });
 });

@@ -17,7 +17,7 @@ const fetchDocumentContent = async (docId) => {
     });
 
     const data = await response.json();
-    return data.content;
+    return data;
   } catch (error) {
     console.error(error);
     enqueueSnackbar(`An error occurred while fetching document content`, {
@@ -28,7 +28,7 @@ const fetchDocumentContent = async (docId) => {
 };
 
 // Function to update search queries
-const updateSearchQueries = async (content, setSearchQuery) => {
+const updateSearchQueries = async (doc_id, setSearchQuery) => {
   try {
     const response = await fetch(`/api/search-queries`, {
       method: "POST",
@@ -37,7 +37,8 @@ const updateSearchQueries = async (content, setSearchQuery) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        content: content,
+        // content: content,
+        doc_id: doc_id,
       }),
     });
 
@@ -75,15 +76,18 @@ function Document({
         )[0].docs[0];
 
         const documentContent = await fetchDocumentContent(docId);
-        setContent((prevContent) => {
-          return [
-            ...prevContent,
-            {
-              id: localStorage.getItem("course_id"),
-              content: documentContent,
-            },
-          ];
-        });
+        if (documentContent.content) {
+          setContent((prevContent) => {
+            return [
+              ...prevContent,
+              {
+                id: localStorage.getItem("course_id"),
+                content: documentContent.content,
+                summary: documentContent?.summary,
+              },
+            ];
+          });
+        }
       } catch (error) {
         console.error(error);
       }
@@ -98,7 +102,10 @@ function Document({
 
     const updateSearch = async () => {
       try {
-        await updateSearchQueries(content.find((d) => d.id == localStorage.getItem("course_id"))?.content, setSearchQuery);
+        const docId = courses.filter(
+          (course) => course.course.id === localStorage.getItem("course_id"),
+        )[0].docs[0];
+        await updateSearchQueries(docId, setSearchQuery);
       } catch (error) {
         console.error(error);
       }

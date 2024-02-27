@@ -7,7 +7,7 @@ import Create from "./components/Create";
 import Document from "./components/Document";
 import References from "./components/References";
 import Feedback from "./components/Feedback";
-import About from "./components/About"
+import About from "./components/About";
 
 import { SnackbarProvider, enqueueSnackbar } from "notistack";
 
@@ -18,7 +18,7 @@ import {
   BrowserRouter as Router,
   Route,
   Routes,
-  Navigate
+  Navigate,
 } from "react-router-dom";
 
 import { socket } from "./socket";
@@ -87,9 +87,9 @@ function App() {
   }, []);
 
   const [courses, setCourses] = useState(null);
-  const [ searchQueries, setSearchQuery ]= useState([])
-  const [messages, setMessages] = useState([])
-  const [content, setContent] = useState([])
+  const [searchQueries, setSearchQuery] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [content, setContent] = useState([]);
 
   return (
     <main>
@@ -101,7 +101,14 @@ function App() {
             <Route
               exact
               path="/courses"
-              element={<Courses user={user} auth={auth} courses={courses} setCourses={setCourses} />}
+              element={
+                <Courses
+                  user={user}
+                  auth={auth}
+                  courses={courses}
+                  setCourses={setCourses}
+                />
+              }
             />
             <Route
               exact
@@ -113,20 +120,41 @@ function App() {
               element={<Profile user={user} auth={auth} />}
             />
             <Route
-              path="/feedback" 
+              path="/feedback"
               element={<Feedback user={user} auth={auth} />}
             />
-            <Route
-              path="/about" 
-              element={<About user={user} auth={auth} />}
-            />
+            <Route path="/about" element={<About user={user} auth={auth} />} />
             <Route
               path="/courses/:id"
-              element={<Document user={user} auth={auth} socket={socket} courses={courses} searchQueries={searchQueries} setSearchQuery={setSearchQuery} messages={messages} setMessages={setMessages} content={content} setContent={setContent} />}
+              element={
+                <Document
+                  user={user}
+                  auth={auth}
+                  socket={socket}
+                  courses={courses}
+                  searchQueries={searchQueries}
+                  setSearchQuery={setSearchQuery}
+                  messages={messages}
+                  setMessages={setMessages}
+                  content={content}
+                  setContent={setContent}
+                />
+              }
             />
             <Route
               path="/courses/references/:id"
-              element={<References user={user} auth={auth} socket={socket} courses={courses} searchQueries={searchQueries} setSearchQuery={setSearchQuery} messages={messages} setMessages={setMessages} />}
+              element={
+                <References
+                  user={user}
+                  auth={auth}
+                  socket={socket}
+                  courses={courses}
+                  searchQueries={searchQueries}
+                  setSearchQuery={setSearchQuery}
+                  messages={messages}
+                  setMessages={setMessages}
+                />
+              }
             />
             <Route path="*" element={<Navigate to="/courses" />} />
           </Routes>

@@ -11,6 +11,7 @@ import SendIcon from "@mui/icons-material/Send";
 import Quiz from "react-quiz-component";
 import BrowserDialog from "./BrowserDialog";
 import { enqueueSnackbar } from "notistack";
+// import ReactPlayer from "react-player/lazy";
 
 function InstaSearch({
   searchResultsWeb,
@@ -57,7 +58,7 @@ function InstaSearch({
                 <li key={index}>
                   <div className="card glass">
                     <div className="row">
-                      <img className="favicon" src={r?.favicon} />
+                      <img className="favicon" src={r?.favicon || null} />
                       <div className="col">
                         <p className="title">{r.title}</p>
                         <p className="displayLink">
@@ -96,10 +97,10 @@ function InstaSearch({
             })
           ) : searchResultsYT &&
             searchResultsYT?.length > 0 &&
-            quizContent.length > 0 &&
+            quizContent?.length > 0 &&
             value == 1 ? (
-            searchResultsYT.map((r) => {
-              let quizData = quizContent.filter((q) => q.id == r.id)[0];
+            searchResultsYT?.map((r) => {
+              let quizData = quizContent.find((q) => q.id == r.id);
               let quiz = quizData
                 ? {
                     nrOfQuestions: "1",
@@ -107,12 +108,16 @@ function InstaSearch({
                       {
                         question: quizData?.question,
                         questionType: "text",
-                        answerSelectionType: "single",
-                        answers: [...quizData?.options],
-                        correctAnswer: quizData?.key.toString(),
+                        answerSelectionType: quizData?.answerSelectionType,
+                        answers: [...quizData?.answers],
+                        correctAnswer:
+                          typeof quizData?.correctAnswer == "number"
+                            ? quizData.correctAnswer.toString()
+                            : quizData.correctAnswer,
                         messageForCorrectAnswer: "Correct answer. Good job.",
                         messageForIncorrectAnswer:
                           "Incorrect answer. Please try again.",
+                        explanation: quizData?.explanation,
                         point: "10",
                       },
                     ],
@@ -121,6 +126,15 @@ function InstaSearch({
               return (
                 <li key={r.id}>
                   <div className="YT-card glass">
+                    {/* <ReactPlayer
+                      url={"https://www.youtube.com/embed/" + r.id}
+                      style={{
+                        borderRadius: "16px !important",
+                        width: "560",
+                        height: "315",
+                      }}
+                      controls={true}
+                    /> */}
                     <iframe
                       width="560"
                       height="315"
@@ -134,7 +148,11 @@ function InstaSearch({
                       }}
                     ></iframe>
                     {quizData ? (
-                      <Quiz quiz={quiz} continueTillCorrect={true} />
+                      <Quiz
+                        quiz={quiz}
+                        continueTillCorrect={true}
+                        showInstantFeedback={true}
+                      />
                     ) : (
                       ""
                     )}
@@ -144,6 +162,7 @@ function InstaSearch({
             })
           ) : (
             <Box sx={{ width: "100%", height: "30%" }}>
+              <br />
               <Skeleton />
               <Skeleton animation="wave" />
               <Skeleton animation={false} />

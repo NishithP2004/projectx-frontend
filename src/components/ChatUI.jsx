@@ -1,6 +1,7 @@
 import "./ChatUI.css";
-import { FaPaperPlane } from "react-icons/fa";
+// import { FaPaperPlane } from "react-icons/fa";
 import { useRef, useEffect } from "react";
+import SendIcon from "@mui/icons-material/Send";
 
 function ChatUI(props) {
   const socket = props.socket;
@@ -19,7 +20,7 @@ function ChatUI(props) {
     };
     handleMessage(data);
     form["message"].value = "";
-    console.log(msg);
+    // console.log(msg);
     socket.emit(
       "message",
       {
@@ -59,7 +60,9 @@ function ChatUI(props) {
   }
 
   useEffect(() => {
-    ref.current.scrollTo(0, ref.current.scrollHeight);
+    ref.current.scrollTo({
+      top: ref.current.scrollHeight,
+    });
   }, [props.messages]);
 
   return (
@@ -71,7 +74,7 @@ function ChatUI(props) {
         height: "100%",
       }}
     >
-      <div className="chat-container glass">
+      <div className="chat-background glass">
         <div id="chat-container">
           <ul id="chat-log" ref={ref}>
             {props.messages.length > 0
@@ -106,19 +109,21 @@ function ChatUI(props) {
           onSubmit={handleSubmit}
           autoComplete="off"
         >
-          <textarea
-            required
-            name="message"
-            placeholder="Type in your message... "
-            rows="1"
-          ></textarea>
-          <button type="submit" className="submit-button">
-            <FaPaperPlane
-              style={{
-                fontSize: "1em",
-              }}
-            />
-          </button>
+          <div className="textarea">
+            <textarea
+              required
+              name="message"
+              placeholder="Type in your message... "
+              rows="2"
+            ></textarea>
+            <button type="submit" className="submit-button">
+              <SendIcon
+                style={{
+                  fontSize: "1.25em",
+                }}
+              />
+            </button>
+          </div>
           <div
             style={{
               width: "100%",
@@ -132,6 +137,7 @@ function ChatUI(props) {
               htmlFor="multipleDocs"
               style={{
                 fontSize: "0.9em",
+                fontFamily: "'DM Sans', sans-serif",
               }}
             >
               Query Multiple documents?{" "}
@@ -139,12 +145,6 @@ function ChatUI(props) {
           </div>
         </form>
       </div>
-      <p
-        id="status"
-        style={{
-          textAlign: "center",
-        }}
-      ></p>
     </main>
   );
 }
